@@ -100,7 +100,8 @@ def checkpoint(
             else:
                 handle = value.save(filename + ".h5")
                 if enable_xdmf:
-                    value.xdmf(filename, handle, key, mh, meshName, modeltime=time)
+                    value.xdmf(filename, handle, key, mh,
+                               meshName, modeltime=time)
 
     # is there a swarm
     if swarm is not None:
@@ -123,5 +124,6 @@ def checkpoint(
             else:
                 handle = value.save(filename + ".h5")
                 if enable_xdmf:
-                    value.xdmf(filename, handle, key, sH, swarmName, modeltime=time)
+                    value.xdmf(filename, handle, key, sH,
+                               swarmName, modeltime=time)
     print_on_rank_zero("Done.....")
