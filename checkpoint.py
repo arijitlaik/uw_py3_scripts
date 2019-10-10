@@ -102,6 +102,7 @@ def checkpoint(
                 if enable_xdmf:
                     value.xdmf(filename, handle, key, mh,
                                meshName, modeltime=time)
+            uw.mpi.barrier()
 
     # is there a swarm
     if swarm is not None:
@@ -126,4 +127,5 @@ def checkpoint(
                 if enable_xdmf:
                     value.xdmf(filename, handle, key, sH,
                                swarmName, modeltime=time)
+            uw.mpi.barrier()
     print_on_rank_zero("Done.....")
