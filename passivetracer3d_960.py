@@ -1,7 +1,7 @@
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
-
+from scipy import interpolate
 outputDir = "/run/user/1000/gvfs/sftp:host=lisa.surfsara.nl,user=alaik/home/alaik/uw_py3_3D/t3d_960_llr_IW_nm/"
 
 # fH = open(outputDir + "/checkpoint.log", "r")
@@ -11,6 +11,19 @@ outputDir = "/run/user/1000/gvfs/sftp:host=lisa.surfsara.nl,user=alaik/home/alai
 # ) as outfile:
 #     temp = infile.read().replace(";", "")
 #     outfile.write(temp)
+X, Z = np.meshgrid(
+    np.linspace(
+        0,
+        12,
+        33,
+    ),
+    np.linspace(
+        0,
+        12,
+        33,
+    ),
+    indexing="ij",
+)
 
 time = np.genfromtxt(outputDir + "/tcheckpoint.log", delimiter=",")
 
@@ -25,6 +38,8 @@ for i in time[:, 0]:
 
     crX = tcord[:, 0]
     crZ = tcord[:, 2]
+
+
     inX = ic[:, 0]
     inZ = ic[:, 2]
     width = .75
@@ -56,7 +71,11 @@ for i in time[:, 0]:
     # g = np.where(gXX | gZZ)
     g = 9
     # plt.plot(hatch)
-
+    print("int...")
+    Vx=interpolate.griddata((crZ, crX),tvel[:,0], (Z, X), method='nearest')
+    Vz=interpolate.griddata((crZ, crX),tvel[:,2], (Z, X), method='nearest')
+    Vm=(Vz**2 + Vx**2)**.5
+    print("int")
     def plot_it():
         plt.clf()
         plt.xlim((0, 12))
@@ -68,8 +87,12 @@ for i in time[:, 0]:
         plt.scatter(crZ[gX], crX[gX], c='black', s=12, alpha=0.5)
         plt.scatter(crZ[gZ], crX[gZ], c='black', s=12, alpha=0.5)
         plt.scatter(crZ[mat], crX[mat], c=matC[mat],s=24, cmap="tab20c")
-        # q=plt.quiver(crZ, crX, tvel[:, 1], tvel[:, 0],
-        #            (tvel[:, 1]**2 + tvel[:, 0]**2)*.5, cmap='magma')
+        # plt.streamplot(Z,X,Vz,Vx, color=Vm,density = 2.5)
+        q=plt.quiver(Z, X, Vz,Vx,Vm,scale=0.018, cmap='Greys')
+
+        qk = plt.quiverkey(q, 0.9, 0.9, 0.0021928896839249795/2, r'$5 \frac{cm}{year}$', labelpos='E',
+                   coordinates='figure')
+                   # (tvel[:, 1]**2 + tvel[:, 0]**2)*.5, cmap='magma')
         #
         plt.gcf().set_size_inches(12, 12)
         plt.savefig('960/q'+stStr+".png", dpi=120)
